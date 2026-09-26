@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+<title>The System</title>
+<meta name="theme-color" content="#7c3aed"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;--bg4:#222;--purple:#7c3aed;--purple2:#a78bfa;--purple3:rgba(124,58,237,.15);--gold:#f59e0b;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--text:#f0f0f0;--text2:#a0a0a0;--text3:#525252;--border:#2a2a2a}
+body{background:var(--bg);font-family:-apple-system,'Inter',sans-serif;color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;overflow-x:hidden}
+
+/* HEADER */
+.header{padding:16px 16px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.header-title{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.rank-badge{background:var(--purple3);border:1.5px solid var(--purple);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:800;color:var(--purple2);display:flex;align-items:center;gap:6px}
+.xp-bar-wrap{margin:0 16px 14px;background:var(--bg3);border-radius:999px;height:6px;overflow:hidden}
+.xp-bar{height:100%;border-radius:999px;background:linear-gradient(90deg,#5b21b6,var(--purple2));transition:width .5s}
+
+/* TABS */
+.tabs{display:flex;padding:0 16px;gap:4px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);color:var(--text3);background:none;font-family:inherit;transition:all .15s}
+.tab.on{background:var(--purple3);border-color:var(--purple);color:var(--purple2)}
+
+/* PAGES */
+.page{display:none;padding:0 16px 100px}
+.page.on{display:block}
+.section-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:10px}
+
+/* WEEK STRIP */
+.week-strip{display:flex;gap:6px;margin-bottom:14px}
+.day-pill{flex:1;border-radius:10px;padding:8px 4px;text-align:center;cursor:pointer;border:1px solid var(--border);background:var(--bg2);transition:all .15s}
+.day-pill.today{border-color:var(--purple);background:var(--purple3)}
+.day-pill.done{background:var(--purple);border-color:var(--purple)}
+.day-pill .d-name{font-size:9px;color:var(--text3);font-weight:600}
+.day-pill.today .d-name,.day-pill.done .d-name{color:rgba(255,255,255,.7)}
+.day-pill .d-num{font-size:14px;font-weight:800}
+.day-pill .d-dot{width:5px;height:5px;border-radius:50%;background:var(--green);margin:3px auto 0}
+
+/* HABIT CARD */
+.habit-card{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--border)}
+.habit-card:first-child{border-top:none}
+.habit-check{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .2s;font-size:14px}
+.habit-check.done{background:var(--purple);border-color:var(--purple)}
+.habit-emoji{font-size:22px;flex-shrink:0;cursor:pointer}
+.habit-info{flex:1;min-width:0}
+.habit-name{font-size:14px;font-weight:600}
+.habit-streak{font-size:11px;color:var(--text3);margin-top:2px}
+.habit-streak span{color:var(--gold)}
+.streak-bar{margin-top:6px;background:var(--bg3);border-radius:999px;height:3px;overflow:hidden}
+.streak-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--purple),var(--purple2))}
+.del-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:4px;opacity:.5}
+.del-btn:active{opacity:1;color:var(--red)}
+
+/* ADD */
+.add-row{display:flex;gap:8px;margin-top:12px}
+.add-inp{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--text);font-family:inherit;outline:none}
+.add-inp:focus{border-color:var(--purple)}
+.add-btn{background:var(--purple);color:#fff;border:none;border-radius:10px;padding:10px 14px;font-size:20px;cursor:pointer}
+
+/* PROGRESS */
+.progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.progress-bg{background:var(--bg3);border-radius:999px;height:8px;overflow:hidden;margin-bottom:14px}
+.progress-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#5b21b6,var(--purple2));transition:width .5s}
+
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
+.stat-val{font-size:22px;font-weight:800;color:var(--purple2)}
+.stat-label{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* CHART */
+.chart-bars{display:flex;align-items:flex-end;gap:4px;height:80px;margin:10px 0 4px}
+.chart-bar{flex:1;border-radius:4px 4px 0 0;background:rgba(124,58,237,.4);min-height:3px;transition:height .3s;position:relative;cursor:pointer}
+.chart-bar.today-bar{background:var(--purple)}
+.chart-labels{display:flex;gap:4px}
+.chart-label{flex:1;text-align:center;font-size:9px;color:var(--text3)}
+
+/* PERFS */
+.perf-table{width:100%;border-collapse:collapse}
+.perf-th{font-size:10px;color:var(--text3);font-weight:700;padding:6px 4px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+.perf-td{padding:8px 4px;border-bottom:1px solid var(--border);font-size:13px}
+.perf-inp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 6px;font-size:12px;color:var(--text);text-align:center;outline:none;font-family:inherit}
+.perf-inp:focus{border-color:var(--purple)}
+.pr-badge{font-size:9px;font-weight:700;color:var(--gold);background:rgba(245,158,11,.15);border-radius:4px;padding:1px 5px;margin-left:4px}
+
+/* CORPS */
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px}
+.metric-label{font-size:11px;color:var(--text3);margin-bottom:6px;font-weight:600}
+.metric-val{font-size:26px;font-weight:800;color:var(--purple2);margin-bottom:8px}
+.metric-inp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:15px;color:var(--text);text-align:center;font-family:inherit;outline:none}
+.metric-inp:focus{border-color:var(--purple)}
+.metric-history{font-size:10px;color:var(--text3);margin-top:6px}
+
+/* RANG */
+.rank-hero{text-align:center;padding:24px 0 16px}
+.rank-icon{font-size:64px;line-height:1;margin-bottom:10px;filter:drop-shadow(0 0 20px var(--purple))}
+.rank-name{font-size:28px;font-weight:800;color:var(--purple2);margin-bottom:4px}
+.rank-xp{font-size:13px;color:var(--text3)}
+.rank-progress{margin:14px 0}
+.xp-bg{background:var(--bg3);border-radius:999px;height:10px;overflow:hidden}
+.xp-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#5b21b6,var(--purple2));transition:width .6s}
+.rank-road{display:flex;justify-content:space-between;margin:16px 0}
+.road-rank{text-align:center;flex:1}
+.road-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;margin:0 auto 4px;transition:all .3s}
+.road-dot.done{background:var(--purple);border-color:var(--purple);color:#fff}
+.road-dot.current{background:var(--purple3);border-color:var(--purple2);color:var(--purple2)}
+.road-label{font-size:9px;color:var(--text3)}
+.badges-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.badge-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center;transition:all .3s}
+.badge-item.unlocked{border-color:var(--gold);background:rgba(245,158,11,.08)}
+.badge-item.locked{opacity:.4}
+.badge-icon{font-size:22px;margin-bottom:4px}
+.badge-name{font-size:9px;color:var(--text3);font-weight:600;line-height:1.2}
+.badge-item.unlocked .badge-name{color:var(--gold)}
+
+/* CLOCK */
+.clock-wrap{text-align:center;padding:30px 0 20px}
+.clock-time{font-size:64px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-2px;color:var(--purple2);line-height:1}
+.clock-date{font-size:14px;color:var(--text3);margin-top:8px}
+.clock-quests{margin-top:20px;font-size:14px;color:var(--text2)}
+.clock-rank{margin-top:8px;font-size:20px;font-weight:800;color:var(--purple2)}
+
+/* EPIC OVERLAY */
+.epic-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:300;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.epic-overlay.show{display:flex}
+.epic-emoji{font-size:80px;animation:bounce .6s infinite alternate}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-12px)}}
+.epic-title{font-size:32px;font-weight:800;color:var(--purple2);margin:16px 0 8px}
+.epic-sub{font-size:16px;color:var(--text2);margin-bottom:28px}
+.epic-close{background:var(--purple);color:#fff;border:none;border-radius:12px;padding:12px 32px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
+
+/* EMOJI PICKER */
+.emoji-panel{display:none;flex-wrap:wrap;gap:6px;margin-top:8px;background:var(--bg3);border-radius:12px;padding:10px}
+.emoji-panel.open{display:flex}
+.ep-emoji{font-size:22px;cursor:pointer;padding:4px;border-radius:6px;transition:background .1s}
+.ep-emoji:active{background:var(--purple3)}
+
+/* MISC */
+.btn-primary{width:100%;background:var(--purple);color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px}
+.btn-primary:active{opacity:.85}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;z-index:400;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="header-title">⚡ The System</div>
+    <div style="font-size:11px;color:var(--text3);margin-top:2px" id="header-date"></div>
+  </div>
+  <div class="rank-badge" id="header-rank">
+    <span id="header-rank-icon">🌱</span>
+    <span id="header-rank-name">Rang E</span>
+    <span style="color:var(--text3);font-weight:400" id="header-xp-label">0 XP</span>
+  </div>
+</div>
+<div class="xp-bar-wrap"><div class="xp-bar" id="xp-bar" style="width:0%"></div></div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on" onclick="goTab('quetes')" id="tab-quetes">🎯 Quêtes</button>
+  <button class="tab" onclick="goTab('perfs')" id="tab-perfs">💪 Perfs</button>
+  <button class="tab" onclick="goTab('corps')" id="tab-corps">🧍 Corps</button>
+  <button class="tab" onclick="goTab('stats')" id="tab-stats">📊 Stats</button>
+  <button class="tab" onclick="goTab('rang')" id="tab-rang">👑 Rang</button>
+  <button class="tab" onclick="goTab('clock')" id="tab-clock">⏱ Horloge</button>
+</div>
+
+<!-- PAGE QUETES -->
+<div class="page on" id="page-quetes">
+  <div class="week-strip" id="week-strip"></div>
+  <div class="section-title">Progression du jour</div>
+  <div class="progress-row">
+    <span id="prog-label" style="font-size:13px;font-weight:600">0 / 0</span>
+    <span id="prog-xp" style="font-size:12px;color:var(--gold)">+0 XP</span>
+  </div>
+  <div class="progress-bg"><div class="progress-fill" id="prog-bar" style="width:0%"></div></div>
+  <div class="section-title">Quêtes du jour</div>
+  <div class="card" style="padding:8px 16px" id="habits-list"></div>
+  <div class="add-row">
+    <input class="add-inp" placeholder="Nouvelle habitude..." id="new-habit-inp"/>
+    <button class="add-btn" onclick="addHabit()">+</button>
+  </div>
+  <div class="emoji-panel" id="emoji-panel"></div>
+</div>
+
+<!-- PAGE PERFS -->
+<div class="page" id="page-perfs">
+  <div class="card">
+    <div class="section-title">Performances (1RM / meilleure série)</div>
+    <table class="perf-table" id="perf-table">
+      <thead><tr>
+        <th class="perf-th" style="text-align:left">Exercice</th>
+        <th class="perf-th">kg</th>
+        <th class="perf-th">Reps</th>
+        <th class="perf-th">PR</th>
+      </tr></thead>
+      <tbody id="perf-body"></tbody>
+    </table>
+  </div>
+  <button class="btn-primary" onclick="savePerfs()">💾 Sauvegarder</button>
+</div>
+
+<!-- PAGE CORPS -->
+<div class="page" id="page-corps">
+  <div class="metric-grid" id="metric-grid"></div>
+  <div class="section-title">Historique</div>
+  <div class="card" id="corps-history"></div>
+</div>
+
+<!-- PAGE STATS -->
+<div class="page" id="page-stats">
+  <div class="stats-grid" id="stats-grid"></div>
+  <div class="section-title">Habitudes — 7 derniers jours</div>
+  <div class="card">
+    <div class="chart-bars" id="chart-bars"></div>
+    <div class="chart-labels" id="chart-labels"></div>
+  </div>
+  <div class="section-title">Meilleures séries</div>
+  <div class="card" id="best-streaks"></div>
+</div>
+
+<!-- PAGE RANG -->
+<div class="page" id="page-rang">
+  <div class="rank-hero">
+    <div class="rank-icon" id="rank-icon">🌱</div>
+    <div class="rank-name" id="rank-name">Rang E</div>
+    <div class="rank-xp" id="rank-xp-label">0 XP · 50 pour rang D</div>
+    <div class="rank-progress">
+      <div class="xp-bg"><div class="xp-fill" id="rank-xp-bar" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="rank-road" id="rank-road"></div>
+  <div class="section-title">Badges</div>
+  <div class="badges-grid" id="badges-grid"></div>
+</div>
+
+<!-- PAGE CLOCK -->
+<div class="page" id="page-clock">
+  <div class="clock-wrap">
+    <div class="clock-time" id="clock-time">00:00</div>
+    <div class="clock-date" id="clock-date"></div>
+    <div class="clock-quests" id="clock-quests"></div>
+    <div class="clock-rank" id="clock-rank"></div>
+  </div>
+  <div class="section-title">Buff du jour</div>
+  <div class="card" style="text-align:center;padding:20px" id="buff-card">
+    <div id="buff-icon" style="font-size:40px;margin-bottom:8px"></div>
+    <div id="buff-name" style="font-size:18px;font-weight:800;color:var(--purple2)"></div>
+    <div id="buff-desc" style="font-size:13px;color:var(--text2);margin-top:6px"></div>
+  </div>
+</div>
+
+<!-- EPIC OVERLAY -->
+<div class="epic-overlay" id="epic-overlay">
+  <div class="epic-emoji" id="epic-emoji">⚡</div>
+  <div class="epic-title" id="epic-title"></div>
+  <div class="epic-sub" id="epic-sub"></div>
+  <button class="epic-close" onclick="closeEpic()">Continuer →</button>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ DATA ============
+const RANKS = [
+  {name:'E',icon:'🌱',color:'#6b7280',xpNeeded:0,next:50},
+  {name:'D',icon:'⚔️',color:'#3b82f6',xpNeeded:50,next:150},
+  {name:'C',icon:'🔥',color:'#22c55e',xpNeeded:150,next:350},
+  {name:'B',icon:'💜',color:'#a855f7',xpNeeded:350,next:700},
+  {name:'A',icon:'🌙',color:'#f59e0b',xpNeeded:700,next:1200},
+  {name:'S',icon:'⭐',color:'#ef4444',xpNeeded:1200,next:Infinity},
+];
+
+const DEFAULT_HABITS = [
+  {id:'h1',name:'Journaling',emoji:'📓',streak:0,bestStreak:0},
+  {id:'h2',name:'Nofap',emoji:'🚫',streak:0,bestStreak:0},
+  {id:'h3',name:'Travail',emoji:'💼',streak:0,bestStreak:0},
+  {id:'h4',name:'Tracking calories',emoji:'🥗',streak:0,bestStreak:0},
+  {id:'h5',name:'Gym / Étirements',emoji:'🏋️',streak:0,bestStreak:0},
+  {id:'h6',name:'Méditation',emoji:'🧘',streak:0,bestStreak:0},
+  {id:'h7',name:'Couché tôt',emoji:'🌙',streak:0,bestStreak:0},
+  {id:'h8',name:'10 000 pas',emoji:'👣',streak:0,bestStreak:0},
+];
+
+const DEFAULT_PERFS = [
+  {name:'Développé couché',kg:'',reps:'',pr:''},
+  {name:'Squat',kg:'',reps:'',pr:''},
+  {name:'Soulevé de terre',kg:'',reps:'',pr:''},
+  {name:'Développé militaire',kg:'',reps:'',pr:''},
+  {name:'Tractions',kg:'',reps:'',pr:''},
+  {name:'Curl barre',kg:'',reps:'',pr:''},
+];
+
+const METRICS = [
+  {key:'poids',label:'Poids',unit:'kg',icon:'⚖️'},
+  {key:'taille',label:'Taille',unit:'cm',icon:'📏'},
+  {key:'bras',label:'Bras',unit:'cm',icon:'💪'},
+  {key:'graisse',label:'Graisse',unit:'%',icon:'🔥'},
+];
+
+const BUFFS = [
+  {icon:'⚡',name:'Mode Turbo',desc:'Double XP toute la journée — tout ce que tu accomplis compte double'},
+  {icon:'🔮',name:'Vision Cristal',desc:'Tes objectifs sont clairs aujourd\'hui — concentre-toi sur l\'essentiel'},
+  {icon:'🛡️',name:'Bouclier Mental',desc:'Ignore les distractions — tu es en mode focus total'},
+  {icon:'🌙',name:'Rituel Nocturne',desc:'Bonus XP si tu complètes tes habitudes avant 22h'},
+  {icon:'💎',name:'Diamant Brut',desc:'Chaque habitude complétée renforce ta discipline durablement'},
+  {icon:'🐉',name:'Éveil du Dragon',desc:'Tu es dans ta meilleure forme — dépasse tes limites aujourd\'hui'},
+  {icon:'🌊',name:'État de Flow',desc:'Enchaîne tes habitudes sans interruption pour un bonus final'},
+];
+
+const BADGES_CONFIG = [
+  {id:'b1',name:'Premier Pas',icon:'🌅',desc:'1ère habitude',check:s=>s.totalDone>=1},
+  {id:'b2',name:'Flamme',icon:'🔥',desc:'Streak 3j',check:s=>s.maxSingleStreak>=3},
+  {id:'b3',name:'Régulier',icon:'📅',desc:'7j consécutifs',check:s=>s.maxSingleStreak>=7},
+  {id:'b4',name:'Électrisé',icon:'⚡',desc:'5 habitudes/jour',check:s=>s.maxDayDone>=5},
+  {id:'b5',name:'Perfectionniste',icon:'🎯',desc:'Toutes les habitudes',check:s=>s.perfectDays>=1},
+  {id:'b6',name:'Rang D',icon:'⚔️',desc:'Atteindre rang D',check:s=>s.xp>=50},
+  {id:'b7',name:'Rang C',icon:'🔥',desc:'Atteindre rang C',check:s=>s.xp>=150},
+  {id:'b8',name:'Rang B',icon:'💜',desc:'Atteindre rang B',check:s=>s.xp>=350},
+  {id:'b9',name:'Rang A',icon:'🌙',desc:'Atteindre rang A',check:s=>s.xp>=700},
+  {id:'b10',name:'Rang S',icon:'⭐',desc:'Atteindre rang S',check:s=>s.xp>=1200},
+  {id:'b11',name:'Guerrier',icon:'🏆',desc:'100 XP total',check:s=>s.xp>=100},
+  {id:'b12',name:'Légende',icon:'👑',desc:'500 XP total',check:s=>s.xp>=500},
+];
+
+// ============ STATE ============
+function loadState() {
+  try { const s=localStorage.getItem('the_system_v2'); if(s)return JSON.parse(s); } catch(e){}
+  return {
+    habits: JSON.parse(JSON.stringify(DEFAULT_HABITS)),
+    completed: {}, // {dateStr: [habitId,...]}
+    xp: 0,
+    perfs: JSON.parse(JSON.stringify(DEFAULT_PERFS)),
+    corps: {}, // {dateStr: {poids,taille,bras,graisse}}
+    badges: [],
+    totalDone: 0,
+    maxSingleStreak: 0,
+    maxDayDone: 0,
+    perfectDays: 0,
+  };
+}
+let state = loadState();
+function saveState() { try { localStorage.setItem('the_system_v2', JSON.stringify(state)); } catch(e){} }
+
+// ============ UTILS ============
+const DAYS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+const MONTHS = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+function today() { return new Date().toISOString().split('T')[0]; }
+function dateStr(d) { return d.toISOString().split('T')[0]; }
+function todayCompleted() { return state.completed[today()] || []; }
+function getRank() {
+  let r=RANKS[0];
+  for(let i=0;i<RANKS.length;i++) { if(state.xp>=RANKS[i].xpNeeded) r=RANKS[i]; }
+  return r;
+}
+function getRankIdx() {
+  let idx=0;
+  for(let i=0;i<RANKS.length;i++) { if(state.xp>=RANKS[i].xpNeeded) idx=i; }
+  return idx;
+}
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+function showEpic(emoji,title,sub) {
+  document.getElementById('epic-emoji').textContent=emoji;
+  document.getElementById('epic-title').textContent=title;
+  document.getElementById('epic-sub').textContent=sub;
+  document.getElementById('epic-overlay').classList.add('show');
+}
+function closeEpic() { document.getElementById('epic-overlay').classList.remove('show'); }
+
+// ============ TABS ============
+function goTab(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('page-'+id).classList.add('on');
+  document.getElementById('tab-'+id).classList.add('on');
+  if(id==='quetes') renderQuetes();
+  else if(id==='perfs') renderPerfs();
+  else if(id==='corps') renderCorps();
+  else if(id==='stats') renderStats();
+  else if(id==='rang') renderRang();
+  else if(id==='clock') renderClock();
+}
+
+// ============ QUETES ============
+function renderQuetes() {
+  renderWeekStrip();
+  renderHabits();
+  renderProgress();
+}
+
+function renderWeekStrip() {
+  const strip = document.getElementById('week-strip');
+  const now = new Date();
+  const days = [];
+  for(let i=6;i>=0;i--) {
+    const d = new Date(now); d.setDate(now.getDate()-i);
+    days.push(d);
+  }
+  strip.innerHTML = days.map(d => {
+    const ds = dateStr(d);
+    const isToday = ds===today();
+    const done = (state.completed[ds]||[]).length;
+    const total = state.habits.length;
+    const isDone = done===total && total>0;
+    return `<div class="day-pill${isToday?' today':''}${isDone?' done':''}">
+      <div class="d-name">${DAYS[d.getDay()]}</div>
+      <div class="d-num">${d.getDate()}</div>
+      ${done>0 && !isDone ? `<div class="d-dot" style="background:${done/total>0.5?'var(--green)':'var(--text3)'}"></div>` : ''}
+      ${isDone ? `<div style="font-size:10px;color:#fff;margin-top:2px">✓</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderHabits() {
+  const done = todayCompleted();
+  const list = document.getElementById('habits-list');
+  list.innerHTML = state.habits.map((h,i) => {
+    const isDone = done.includes(h.id);
+    const pct = Math.min(100, Math.round((h.streak/7)*100));
+    return `<div class="habit-card" id="hcard-${h.id}">
+      <div class="habit-check${isDone?' done':''}" onclick="toggleHabit('${h.id}')">
+        ${isDone?'<svg width="14" height="11" viewBox="0 0 14 11" fill="none"><path d="M1 5.5L5.5 10L13 1" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}
+      </div>
+      <div class="habit-emoji" onclick="openEmojiPicker('${h.id}')">${h.emoji}</div>
+      <div class="habit-info">
+        <div class="habit-name" style="text-decoration:${isDone?'line-through':'none'};opacity:${isDone?0.5:1}">${h.name}</div>
+        <div class="habit-streak">🔥 Série : <span>${h.streak}j</span>${h.bestStreak>0?` · Record : <span>${h.bestStreak}j</span>`:''}</div>
+        ${h.streak>0?`<div class="streak-bar"><div class="streak-fill" style="width:${pct}%"></div></div>`:''}
+      </div>
+      <button class="del-btn" onclick="deleteHabit('${h.id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function renderProgress() {
+  const done = todayCompleted().length;
+  const total = state.habits.length;
+  const pct = total>0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('prog-label').textContent = `${done} / ${total}`;
+  document.getElementById('prog-xp').textContent = `+${done*3} XP`;
+  document.getElementById('prog-bar').style.width = pct+'%';
+}
+
+function toggleHabit(id) {
+  const done = todayCompleted();
+  const h = state.habits.find(x=>x.id===id);
+  if(!h) return;
+  const prev_rank = getRankIdx();
+  const ds = today();
+  if(!state.completed[ds]) state.completed[ds]=[];
+  if(done.includes(id)) {
+    state.completed[ds] = state.completed[ds].filter(x=>x!==id);
+    state.xp = Math.max(0, state.xp-3);
+    h.streak = Math.max(0, h.streak-0); // don't reduce streak on uncheck
+    showToast('Décoché');
+  } else {
+    state.completed[ds].push(id);
+    state.xp += 3;
+    state.totalDone++;
+    // Update streak
+    const yest = new Date(); yest.setDate(yest.getDate()-1);
+    const yestStr = dateStr(yest);
+    const yestDone = state.completed[yestStr]||[];
+    if(yestDone.includes(id)) { h.streak++; }
+    else { h.streak = 1; }
+    if(h.streak > h.bestStreak) h.bestStreak = h.streak;
+    if(h.streak > state.maxSingleStreak) state.maxSingleStreak = h.streak;
+    const newDayDone = state.completed[ds].length;
+    if(newDayDone > state.maxDayDone) state.maxDayDone = newDayDone;
+    if(newDayDone === state.habits.length) {
+      state.perfectDays++;
+      setTimeout(()=>showEpic('🎯','Journée parfaite !','Toutes tes quêtes accomplies aujourd\'hui !'), 300);
+    } else {
+      showToast(`+3 XP ⚡`);
+    }
+  }
+  const new_rank = getRankIdx();
+  if(new_rank > prev_rank) {
+    const r = RANKS[new_rank];
+    setTimeout(()=>showEpic(r.icon,`RANG ${r.name} !`,`Tu as atteint le rang ${r.name} — continue comme ça !`), 800);
+  }
+  checkBadges();
+  saveState();
+  renderHabits();
+  renderProgress();
+  renderWeekStrip();
+  updateHeader();
+}
+
+function addHabit() {
+  const inp = document.getElementById('new-habit-inp');
+  const name = inp.value.trim();
+  if(!name) return;
+  state.habits.push({id:'h'+Date.now(),name,emoji:'✨',streak:0,bestStreak:0});
+  inp.value='';
+  saveState();
+  renderHabits();
+  renderProgress();
+}
+
+function deleteHabit(id) {
+  state.habits = state.habits.filter(h=>h.id!==id);
+  Object.keys(state.completed).forEach(ds=>{
+    state.completed[ds] = state.completed[ds].filter(x=>x!==id);
+  });
+  saveState();
+  renderHabits();
+  renderProgress();
+}
+
+let emojiTargetId = null;
+const EMOJIS = ['📓','🚫','💼','🥗','🏋️','🧘','🌙','👣','💪','🎯','🔥','⚡','🏆','📚','🎵','🌅','🍎','💧','🧠','❤️','🚀','🌟','💎','⭐','🎨','✍️','🏃','🤸'];
+function openEmojiPicker(id) {
+  emojiTargetId = id;
+  const panel = document.getElementById('emoji-panel');
+  panel.innerHTML = EMOJIS.map(e=>`<span class="ep-emoji" onclick="setEmoji('${e}')">${e}</span>`).join('');
+  panel.classList.toggle('open');
+}
+function setEmoji(e) {
+  const h = state.habits.find(x=>x.id===emojiTargetId);
+  if(h) { h.emoji=e; saveState(); renderHabits(); }
+  document.getElementById('emoji-panel').classList.remove('open');
+}
+
+// ============ PERFS ============
+function renderPerfs() {
+  const tbody = document.getElementById('perf-body');
+  tbody.innerHTML = state.perfs.map((p,i) => `
+    <tr>
+      <td class="perf-td" style="font-weight:600;font-size:12px">${p.name}</td>
+      <td class="perf-td"><input class="perf-inp" type="number" step="0.5" placeholder="kg" value="${p.kg}" id="perf-kg-${i}"/></td>
+      <td class="perf-td"><input class="perf-inp" type="number" placeholder="reps" value="${p.reps}" id="perf-reps-${i}"/></td>
+      <td class="perf-td" style="font-size:12px;color:var(--gold);font-weight:700">${p.pr||'—'}<span class="pr-badge" style="display:${p.pr?'inline':'none'}">PR</span></td>
+    </tr>`).join('');
+}
+
+function savePerfs() {
+  let newPRs = 0;
+  state.perfs.forEach((p,i) => {
+    const kg = parseFloat(document.getElementById('perf-kg-'+i)?.value)||0;
+    const reps = parseInt(document.getElementById('perf-reps-'+i)?.value)||0;
+    if(kg>0 && reps>0) {
+      const oneRM = Math.round(kg*(1+reps/30)*10)/10;
+      const prevPR = parseFloat(p.pr)||0;
+      if(oneRM > prevPR) { p.pr=oneRM; newPRs++; }
+      p.kg=kg; p.reps=reps;
+    }
+  });
+  saveState();
+  if(newPRs>0) { showEpic('🏆',`${newPRs} nouveau${newPRs>1?'x':''} PR !`,'Tu repousses tes limites — continue !'); }
+  else { showToast('💾 Perfs sauvegardées !'); }
+  renderPerfs();
+}
+
+// ============ CORPS ============
+function renderCorps() {
+  const grid = document.getElementById('metric-grid');
+  const todayData = state.corps[today()]||{};
+  grid.innerHTML = METRICS.map(m => `
+    <div class="metric-card">
+      <div class="metric-label">${m.icon} ${m.label}</div>
+      <div class="metric-val">${todayData[m.key]||'—'}<span style="font-size:14px;color:var(--text3)"> ${m.unit}</span></div>
+      <input class="metric-inp" type="number" step="0.1" placeholder="${m.label}..." id="metric-${m.key}" value="${todayData[m.key]||''}" oninput="updateMetric('${m.key}',this.value)"/>
+    </div>`).join('');
+
+  // History
+  const hist = document.getElementById('corps-history');
+  const entries = Object.entries(state.corps).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,5);
+  if(entries.length===0) { hist.innerHTML='<div style="font-size:13px;color:var(--text3);padding:8px 0">Aucune donnée encore.</div>'; return; }
+  hist.innerHTML = entries.map(([ds,v])=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--border)">
+      <div style="font-size:12px;color:var(--text3)">${ds}</div>
+      <div style="display:flex;gap:12px">
+        ${METRICS.map(m=>v[m.key]?`<span style="font-size:12px"><span style="color:var(--text3)">${m.icon}</span> ${v[m.key]} ${m.unit}</span>`:'').filter(Boolean).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function updateMetric(key, val) {
+  const ds = today();
+  if(!state.corps[ds]) state.corps[ds]={};
+  if(val) state.corps[ds][key]=parseFloat(val);
+  else delete state.corps[ds][key];
+  if(Object.keys(state.corps[ds]).length===0) delete state.corps[ds];
+  saveState();
+}
+
+// ============ STATS ============
+function renderStats() {
+  // Overview stats
+  const totalXP = state.xp;
+  const totalDays = Object.keys(state.completed).length;
+  const totalHabits = Object.values(state.completed).reduce((s,a)=>s+a.length,0);
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card"><div class="stat-val">${totalXP}</div><div class="stat-label">XP total</div></div>
+    <div class="stat-card"><div class="stat-val">${totalDays}</div><div class="stat-label">Jours actifs</div></div>
+    <div class="stat-card"><div class="stat-val">${totalHabits}</div><div class="stat-label">Habitudes</div></div>`;
+
+  // 7-day chart
+  const bars = document.getElementById('chart-bars');
+  const labels = document.getElementById('chart-labels');
+  const now = new Date();
+  const days7 = Array.from({length:7},(_,i)=>{const d=new Date(now);d.setDate(now.getDate()-6+i);return d;});
+  const max = Math.max(...days7.map(d=>(state.completed[dateStr(d)]||[]).length),state.habits.length,1);
+  bars.innerHTML = days7.map(d=>{
+    const ds=dateStr(d);
+    const cnt=(state.completed[ds]||[]).length;
+    const h=Math.max(4,Math.round((cnt/max)*76));
+    const isT=ds===today();
+    return `<div class="chart-bar${isT?' today-bar':''}" style="height:${h}px" title="${cnt} habitudes"></div>`;
+  }).join('');
+  labels.innerHTML = days7.map(d=>`<div class="chart-label">${DAYS[d.getDay()]}</div>`).join('');
+
+  // Best streaks
+  const bs = document.getElementById('best-streaks');
+  const sorted = [...state.habits].sort((a,b)=>b.bestStreak-a.bestStreak).slice(0,4);
+  bs.innerHTML = sorted.map(h=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--border)">
+      <span style="font-size:20px">${h.emoji}</span>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">${h.name}</div>
+        <div style="font-size:11px;color:var(--text3)">Actuel : ${h.streak}j · Record : ${h.bestStreak}j</div>
+      </div>
+      <span style="font-size:14px;font-weight:800;color:var(--gold)">${h.bestStreak}🔥</span>
+    </div>`).join('');
+}
+
+// ============ RANG ============
+function checkBadges() {
+  const stats = {
+    xp: state.xp, totalDone: state.totalDone,
+    maxSingleStreak: state.maxSingleStreak,
+    maxDayDone: state.maxDayDone, perfectDays: state.perfectDays,
+  };
+  BADGES_CONFIG.forEach(b=>{
+    if(!state.badges.includes(b.id) && b.check(stats)) {
+      state.badges.push(b.id);
+      showToast(`🏅 Badge débloqué : ${b.name} !`);
+    }
+  });
+}
+
+function renderRang() {
+  const rank = getRank();
+  const rankIdx = getRankIdx();
+  const nextRank = RANKS[rankIdx+1];
+  document.getElementById('rank-icon').textContent = rank.icon;
+  document.getElementById('rank-name').textContent = `Rang ${rank.name}`;
+  document.getElementById('rank-xp-label').textContent = nextRank
+    ? `${state.xp} XP · ${nextRank.xpNeeded} pour rang ${nextRank.name}`
+    : `${state.xp} XP · Rang maximum !`;
+  const pct = nextRank
+    ? Math.min(100, Math.round(((state.xp-rank.xpNeeded)/(nextRank.xpNeeded-rank.xpNeeded))*100))
+    : 100;
+  document.getElementById('rank-xp-bar').style.width = pct+'%';
+
+  // Rank road
+  document.getElementById('rank-road').innerHTML = RANKS.map((r,i)=>`
+    <div class="road-rank">
+      <div class="road-dot${i<rankIdx?' done':i===rankIdx?' current':''}">${r.icon}</div>
+      <div class="road-label">${r.name}</div>
+    </div>`).join('');
+
+  // Badges
+  document.getElementById('badges-grid').innerHTML = BADGES_CONFIG.map(b=>{
+    const unlocked = state.badges.includes(b.id);
+    return `<div class="badge-item ${unlocked?'unlocked':'locked'}">
+      <div class="badge-icon">${b.icon}</div>
+      <div class="badge-name">${b.name}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============ CLOCK ============
+let clockInterval = null;
+function renderClock() {
+  if(clockInterval) clearInterval(clockInterval);
+  updateClock();
+  clockInterval = setInterval(updateClock, 1000);
+  // Buff du jour
+  const dayIdx = new Date().getDay();
+  const buff = BUFFS[dayIdx % BUFFS.length];
+  document.getElementById('buff-icon').textContent = buff.icon;
+  document.getElementById('buff-name').textContent = buff.name;
+  document.getElementById('buff-desc').textContent = buff.desc;
+}
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('clock-time').textContent = `${h}:${m}`;
+  const dateEl = document.getElementById('clock-date');
+  if(dateEl) dateEl.textContent = `${DAYS[now.getDay()]} ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()} · ${s}s`;
+  const done = todayCompleted().length;
+  const total = state.habits.length;
+  const remaining = total - done;
+  const clockQ = document.getElementById('clock-quests');
+  if(clockQ) clockQ.textContent = remaining>0 ? `${remaining} quête${remaining>1?'s':''} restante${remaining>1?'s':''}` : '✅ Toutes les quêtes complétées !';
+  const rank = getRank();
+  const clockR = document.getElementById('clock-rank');
+  if(clockR) clockR.textContent = `${rank.icon} Rang ${rank.name} · ${state.xp} XP`;
+}
+
+// ============ HEADER ============
+function updateHeader() {
+  const rank = getRank();
+  const rankIdx = getRankIdx();
+  const next = RANKS[rankIdx+1];
+  document.getElementById('header-rank-icon').textContent = rank.icon;
+  document.getElementById('header-rank-name').textContent = `Rang ${rank.name}`;
+  document.getElementById('header-xp-label').textContent = `${state.xp} XP`;
+  const pct = next
+    ? Math.min(100, Math.round(((state.xp-rank.xpNeeded)/(next.xpNeeded-rank.xpNeeded))*100))
+    : 100;
+  document.getElementById('xp-bar').style.width = pct+'%';
+  const now = new Date();
+  document.getElementById('header-date').textContent = `${DAYS[now.getDay()]} ${now.getDate()} ${MONTHS[now.getMonth()]}`;
+}
+
+// ============ INIT ============
+window.addEventListener('load', ()=>{
+  updateHeader();
+  renderQuetes();
+  checkBadges();
+});
+
+// Expose globals
+window.goTab=goTab; window.toggleHabit=toggleHabit; window.addHabit=addHabit;
+window.deleteHabit=deleteHabit; window.openEmojiPicker=openEmojiPicker; window.setEmoji=setEmoji;
+window.savePerfs=savePerfs; window.updateMetric=updateMetric;
+window.closeEpic=closeEpic;
+</script>
+</body>
+</html>
